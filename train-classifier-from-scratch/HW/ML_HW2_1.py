@@ -5,6 +5,8 @@ import pandas as pd
 import matplotlib as plt
 import csv
 
+from mlxtend.plotting import plot_decision_regions
+
 from sklearn import datasets
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import StandardScaler
@@ -50,6 +52,20 @@ def label_encode(dataframe):
     y = pd.DataFrame(y, columns=['class'])
     return encoder, y
 
+def group_label_encode(dataframe):
+    class_map = {
+        'unacc': 0,
+        'acc': 0,
+        'good': 1,
+        'vgood': 1
+    }
+    inv_class_map = {v: a for a, v in class_map.items()}
+    y = dataframe['class'].map(class_map)
+    # encoder = LabelEncoder()
+    # y = encoder.fit_transform(dataframe.values)
+    # y = pd.DataFrame(y, columns=['class'])
+    return inv_class_map, y
+
 def convert_numpy(data):
     if type(data) == type(pd.DataFrame(['ex', 0])):
         return data.to_numpy()
@@ -64,6 +80,14 @@ def show_data():
     print(raw_data.head())
     print('\n')
     print(onehot_data.head())
+
+def plot_result(x, y, model, test_index):
+    plot_decision_regions(x.values, y.values.ravel(), clf=model, feature_index=[0,2])
+    # plt.xlabel()
+    # plt.ylabel()
+    plt.tight_layout()
+    plt.show()
+
 
 def iris_test():
     iris = datasets.load_iris()
@@ -94,7 +118,8 @@ def test_accuracy(classifier, test_x, test_y):
 raw_data = load_data()
 x, y = split_target(raw_data)
 onehot_x =  convert_onehot(x)
-encoder, encoded_y = label_encode(y)
+# encoder, encoded_y = label_encode(y)
+encoder, encoded_y = group_label_encode(y)
 combine_data = pd.concat([onehot_x, encoded_y], axis=1, sort=False)
 print(combine_data)
 train, test = split_test(combine_data, 0.3)
@@ -106,6 +131,8 @@ test_x, test_y = split_target(test)
 
 svm = svm_classifier(train_x, train_y)
 test_accuracy(svm, test_x, test_y)
+print(train_y.values)
+plot_result(train_x, train_y, svm, range(100, 150))
 
 
 # test = pd.DataFrame([[1, 2, 3], [4, 5, 6], [7, 8, 9], [10, 11, 12], [13, 14, 15], [16, 17, 18], [19, 20, 21]], columns=['a', 'b', 'c'])
