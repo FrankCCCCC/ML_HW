@@ -1,0 +1,7 @@
+Model: clf_knn2019-11-24_22-25-40
+Test Condition: 
+- 1000 Samples
+- Gaussian Filter Convolution Sigma = 1.4
+- StandardScalar Normalize
+- 400 PCA Components
+Accuracy: 75.35%
